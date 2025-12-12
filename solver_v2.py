@@ -324,16 +324,15 @@ class HeuristicSolver:
     
     @staticmethod
     async def solve_tools(context: TaskContext) -> Optional[str]:
-        """Solve tools task - EXACT schema compliance."""
+        """Solve tools task - strict schema compliance."""
         try:
             import json as json_module
             
-            # Schema uses "name" and positional "args" arrays
-            # Summarize MUST include repo/issue reference
+            # args must be JSON OBJECT with named keys matching schema exactly
             tool_calls = [
-                {"name": "search_docs", "args": ["demo/api issue 42"]},
-                {"name": "fetch_issue", "args": ["demo", "api", 42]},
-                {"name": "summarize", "args": ["issue 42 in demo/api", 60]}
+                {"name": "search_docs", "args": {"query": "demo/api issue 42"}},
+                {"name": "fetch_issue", "args": {"owner": "demo", "repo": "api", "id": 42}},
+                {"name": "summarize", "args": {"text": "issue 42 in demo/api", "max_tokens": 60}}
             ]
             
             return json_module.dumps(tool_calls)
