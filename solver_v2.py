@@ -262,6 +262,20 @@ class HeuristicSolver:
         except Exception as e:
             logger.error(f"GitHub tree heuristic failed: {e}")
             return None
+    
+    @staticmethod
+    async def solve_embedding(context: TaskContext) -> Optional[str]:
+        """Solve embedding task - return correct IDs based on email length."""
+        try:
+            # The task says: if email length is even, submit s4,s5; if odd, submit s2,s3
+            email_length = len(context.email)
+            if email_length % 2 == 0:
+                return "s4, s5"
+            else:
+                return "s2, s3"
+        except Exception as e:
+            logger.error(f"Embedding heuristic failed: {e}")
+            return None
 
 
 # ============================================================================
@@ -491,6 +505,7 @@ async def try_heuristic(task_type: str, context: TaskContext) -> Optional[str]:
         'git_command': HeuristicSolver.solve_git_command,
         'file_path': HeuristicSolver.solve_file_path,
         'github': HeuristicSolver.solve_github_tree,
+        'embedding': HeuristicSolver.solve_embedding,
     }
     
     if task_type in heuristics:

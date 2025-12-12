@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.0.1 - Force rebuild
+# Version: 2.0.2 - Add embedding heuristic + fix chart handler
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app

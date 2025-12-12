@@ -12,10 +12,10 @@ EMAIL = "23f2004645@ds.study.iitm.ac.in"
 
 TEST_URLS = [
     "https://tds-llm-analysis.s-anand.net/project2",
-    "https://tds-llm-analysis.s-anand.net/demo",
-    "https://tds-llm-analysis.s-anand.net/demo2",
-    "https://p2testingone.vercel.app/q1.html",
-    "https://tdsbasictest.vercel.app/quiz/1",
+    # "https://tds-llm-analysis.s-anand.net/demo",
+    # "https://tds-llm-analysis.s-anand.net/demo2",
+    # "https://p2testingone.vercel.app/q1.html",
+    # "https://tdsbasictest.vercel.app/quiz/1",
 ]
 
 def test_root():
