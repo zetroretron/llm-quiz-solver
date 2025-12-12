@@ -175,16 +175,6 @@ TASK_PATTERNS = {
         r'remember',
         r'previous request',
     ],
-    'shards': [
-        r'shard',
-        r'partition',
-        r'split data',
-    ],
-    'rate': [
-        r'rate limit',
-        r'throttle',
-        r'requests per',
-    ],
     'tools': [
         r'tool\s',
         r'function call',
@@ -387,7 +377,7 @@ class HeuristicSolver:
                 else:
                     # Need full hour, then continue
                     total_minutes += 60
-                    remaining -= per_hour
+                    remaining -= max_in_hour
             
             base_minutes = total_minutes
             
