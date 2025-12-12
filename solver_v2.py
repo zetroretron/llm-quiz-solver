@@ -337,26 +337,13 @@ class HeuristicSolver:
             
             logger.info(f"Tools schema: {tools_data}")
             
-            # Build tool calls matching the schema exactly
-            # The schema has: tools array with name and args (array of param names)
-            # We need to provide actual values for those params
-            tool_calls = []
-            
-            for tool in tools_data.get('tools', []):
-                name = tool.get('name')
-                arg_names = tool.get('args', [])
-                
-                call = {"name": name}
-                
-                # Fill in actual values based on tool name
-                if name == "search_docs":
-                    call["args"] = {"query": "issue 42 demo/api"}
-                elif name == "fetch_issue":
-                    call["args"] = {"owner": "demo", "repo": "api", "id": 42}
-                elif name == "summarize":
-                    call["args"] = {"text": "", "max_tokens": 60}
-                
-                tool_calls.append(call)
+            # Schema shows args as ARRAYS of param names: ['query'], ['owner', 'repo', 'id']
+            # So we need to provide VALUE ARRAYS: ['actual query'], ['demo', 'api', 42]
+            tool_calls = [
+                {"name": "search_docs", "args": ["issue 42 demo/api"]},
+                {"name": "fetch_issue", "args": ["demo", "api", 42]},
+                {"name": "summarize", "args": ["", 60]}
+            ]
             
             return json_module.dumps(tool_calls)
             

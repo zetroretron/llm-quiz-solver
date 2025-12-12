@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.1.1 - Dynamic tools format from schema
+# Version: 2.1.2 - Tools with args as VALUE ARRAYS
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
