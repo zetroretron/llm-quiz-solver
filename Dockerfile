@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.0.7 - Let LLM handle tools task
+# Version: 2.0.8 - Fix DataHandler to skip tools.json
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app

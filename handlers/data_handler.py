@@ -32,13 +32,17 @@ class DataHandler(BaseHandler):
     def can_handle(self, task_type: str, context: TaskContext) -> bool:
         page_lower = context.page_text.lower()
         
+        # Skip tools.json tasks - LLM should handle these
+        if 'tools.json' in page_lower or 'create an ordered plan' in page_lower:
+            return False
+        
         # Check for any data processing patterns
         for patterns in self.TASK_PATTERNS.values():
             if any(p in page_lower for p in patterns):
                 return True
         
         # Check for file types we handle
-        if any(ext in page_lower for ext in ['.csv', '.json', 'logs.zip']):
+        if any(ext in page_lower for ext in ['.csv', 'logs.zip']):
             return True
             
         return task_type in ['data_process', 'csv', 'json', 'logs', 'orders', 'json_sort', 'data_pipeline']
