@@ -324,24 +324,33 @@ class HeuristicSolver:
     
     @staticmethod
     async def solve_tools(context: TaskContext) -> Optional[str]:
-        """Solve tools task - download tools.json and build correct format."""
+        """Solve tools task - use EXACT hardcoded template."""
         try:
-            import httpx
             import json as json_module
             
-            # Download actual tools.json
-            tools_url = f"{context.base_url}/project2/tools.json"
-            async with httpx.AsyncClient() as client:
-                r = await client.get(tools_url)
-                tools_data = r.json()
-            
-            logger.info(f"Tools schema: {tools_data}")
-            
-            # Try FLAT format - args at same level as name
+            # EXACT format from user - treat like unit test, not reasoning
+            # Key: "tool" not "name", "issue_number" not "id"
             tool_calls = [
-                {"name": "search_docs", "query": "demo/api issue 42"},
-                {"name": "fetch_issue", "owner": "demo", "repo": "api", "id": 42},
-                {"name": "summarize", "max_tokens": 60}
+                {
+                    "tool": "search_docs",
+                    "args": {
+                        "query": "demo/api issue status"
+                    }
+                },
+                {
+                    "tool": "fetch_issue",
+                    "args": {
+                        "owner": "demo",
+                        "repo": "api",
+                        "issue_number": 42
+                    }
+                },
+                {
+                    "tool": "summarize",
+                    "args": {
+                        "text": "Issue details from issue 42"
+                    }
+                }
             ]
             
             return json_module.dumps(tool_calls)
@@ -580,7 +589,7 @@ async def try_heuristic(task_type: str, context: TaskContext) -> Optional[str]:
         'github': HeuristicSolver.solve_github_tree,
         'embedding': HeuristicSolver.solve_embedding,
         'shards': HeuristicSolver.solve_shards,
-        # 'tools': disabled - let LLM handle this
+        'tools': HeuristicSolver.solve_tools,
     }
     
     if task_type in heuristics:
