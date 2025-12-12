@@ -573,7 +573,7 @@ async def try_heuristic(task_type: str, context: TaskContext) -> Optional[str]:
         'github': HeuristicSolver.solve_github_tree,
         'embedding': HeuristicSolver.solve_embedding,
         'shards': HeuristicSolver.solve_shards,
-        'tools': HeuristicSolver.solve_tools,
+        # 'tools': removed - let LLM handle the complex format
     }
     
     if task_type in heuristics:
