@@ -367,27 +367,28 @@ class HeuristicSolver:
             per_minute = rate_data.get('per_minute', 10)
             per_hour = rate_data.get('per_hour', 100)
             
-            # Calculate minutes needed based on per-minute cap
-            minutes_for_per_minute = math.ceil(pages / per_minute)
+            # Calculate minutes needed respecting BOTH constraints
+            # Per hour is the tightest constraint for large page counts
             
-            # Calculate minutes needed based on per-hour cap
-            # If per_hour limits how many we can do in 60 minutes
-            if per_hour < pages:
-                # Need multiple hours
-                hours_needed = math.ceil(pages / per_hour)
-                minutes_for_per_hour = hours_needed * 60
-            else:
-                # Can complete within per_hour limit
-                minutes_for_per_hour = math.ceil(pages / per_minute)
+            remaining = pages
+            total_minutes = 0
             
-            # Take the maximum constraint
-            base_minutes = max(minutes_for_per_minute, minutes_for_per_hour // 60 if per_hour < pages else minutes_for_per_minute)
+            while remaining > 0:
+                # In each hour, we can fetch at most per_hour pages
+                # But also limited by per_minute * 60
+                max_in_hour = min(per_hour, per_minute * 60)
+                
+                if remaining <= max_in_hour:
+                    # Can finish within this hour
+                    minutes_needed = math.ceil(remaining / per_minute)
+                    total_minutes += minutes_needed
+                    remaining = 0
+                else:
+                    # Need full hour, then continue
+                    total_minutes += 60
+                    remaining -= per_hour
             
-            # Actually, simpler: minutes = ceil(pages / per_minute)
-            # But constrained by per_hour: if we can only do per_hour per hour
-            # Then in 1 minute we can do min(per_minute, per_hour/60)
-            effective_per_minute = min(per_minute, per_hour / 60)
-            base_minutes = math.ceil(pages / effective_per_minute)
+            base_minutes = total_minutes
             
             # Add personalized offset
             offset = len(context.email) % 3
