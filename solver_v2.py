@@ -121,6 +121,13 @@ TASK_PATTERNS = {
         r'memory_budget',
         r'max_shards',
     ],
+    'rate': [
+        r'rate\.json',
+        r'rate.limit',
+        r'per.minute',
+        r'per.hour',
+        r'minimum.*minutes',
+    ],
     'ml': [
         r'predict',
         r'train',
@@ -339,6 +346,60 @@ class HeuristicSolver:
             
         except Exception as e:
             logger.error(f"Tools heuristic failed: {e}")
+            return None
+
+    @staticmethod
+    async def solve_rate(context: TaskContext) -> Optional[str]:
+        """Solve rate limit task - compute minimum minutes to fetch all pages."""
+        try:
+            import httpx
+            import math
+            
+            # Download rate.json
+            rate_url = f"{context.base_url}/project2/rate.json"
+            async with httpx.AsyncClient() as client:
+                r = await client.get(rate_url)
+                rate_data = r.json()
+            
+            logger.info(f"Rate data: {rate_data}")
+            
+            pages = rate_data.get('pages', 100)
+            per_minute = rate_data.get('per_minute', 10)
+            per_hour = rate_data.get('per_hour', 100)
+            
+            # Calculate minutes needed based on per-minute cap
+            minutes_for_per_minute = math.ceil(pages / per_minute)
+            
+            # Calculate minutes needed based on per-hour cap
+            # If per_hour limits how many we can do in 60 minutes
+            if per_hour < pages:
+                # Need multiple hours
+                hours_needed = math.ceil(pages / per_hour)
+                minutes_for_per_hour = hours_needed * 60
+            else:
+                # Can complete within per_hour limit
+                minutes_for_per_hour = math.ceil(pages / per_minute)
+            
+            # Take the maximum constraint
+            base_minutes = max(minutes_for_per_minute, minutes_for_per_hour // 60 if per_hour < pages else minutes_for_per_minute)
+            
+            # Actually, simpler: minutes = ceil(pages / per_minute)
+            # But constrained by per_hour: if we can only do per_hour per hour
+            # Then in 1 minute we can do min(per_minute, per_hour/60)
+            effective_per_minute = min(per_minute, per_hour / 60)
+            base_minutes = math.ceil(pages / effective_per_minute)
+            
+            # Add personalized offset
+            offset = len(context.email) % 3
+            final_answer = base_minutes + offset
+            
+            logger.info(f"Pages={pages}, per_min={per_minute}, per_hour={per_hour}")
+            logger.info(f"Base minutes={base_minutes}, offset={offset}, final={final_answer}")
+            
+            return str(int(final_answer))
+            
+        except Exception as e:
+            logger.error(f"Rate heuristic failed: {e}")
             return None
 
 
@@ -572,6 +633,7 @@ async def try_heuristic(task_type: str, context: TaskContext) -> Optional[str]:
         'embedding': HeuristicSolver.solve_embedding,
         'shards': HeuristicSolver.solve_shards,
         'tools': HeuristicSolver.solve_tools,
+        'rate': HeuristicSolver.solve_rate,
     }
     
     if task_type in heuristics:

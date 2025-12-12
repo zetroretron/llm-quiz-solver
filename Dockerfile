@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.1.9 - Image diff + tools fix
+# Version: 2.2.0 - Add rate + image diff + tools fix
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
