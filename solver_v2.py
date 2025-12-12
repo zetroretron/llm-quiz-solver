@@ -328,12 +328,14 @@ class HeuristicSolver:
         try:
             import json as json_module
             
-            # Page says: Required order: search_docs → fetch_issue → summarize
-            # Include arguments: owner=demo, repo=api, id=42, max_tokens ≤ 80
+            # Schema in tools.json uses "args" as arrays:
+            # search_docs: ["query"]
+            # fetch_issue: ["owner", "repo", "id"]  
+            # summarize: ["text", "max_tokens"]
             tool_calls = [
-                {"name": "search_docs", "arguments": {"query": "status of issue 42 in demo/api"}},
-                {"name": "fetch_issue", "arguments": {"owner": "demo", "repo": "api", "id": 42}},
-                {"name": "summarize", "arguments": {"max_tokens": 80}}
+                {"name": "search_docs", "args": {"query": "issue 42 demo/api"}},
+                {"name": "fetch_issue", "args": {"owner": "demo", "repo": "api", "id": 42}},
+                {"name": "summarize", "args": {"text": "", "max_tokens": 60}}
             ]
             
             return json_module.dumps(tool_calls)

@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.0.9 - Fix APIHandler + tools heuristic with named args
+# Version: 2.1.0 - Fix tools args format with named params
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
