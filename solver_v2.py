@@ -276,6 +276,45 @@ class HeuristicSolver:
         except Exception as e:
             logger.error(f"Embedding heuristic failed: {e}")
             return None
+    
+    @staticmethod
+    async def solve_shards(context: TaskContext) -> Optional[str]:
+        """Solve shards task - calculate from constraints."""
+        try:
+            import httpx
+            import json as json_module
+            
+            # Get shards.json params
+            params_url = f"{context.base_url}/project2/shards.json"
+            async with httpx.AsyncClient() as client:
+                r = await client.get(params_url)
+                constraints = r.json()
+            
+            dataset = constraints.get('dataset', 18000)
+            max_docs_per_shard = constraints.get('max_docs_per_shard', 3200)
+            max_shards = constraints.get('max_shards', 6)
+            min_replicas = constraints.get('min_replicas', 2)
+            max_replicas = constraints.get('max_replicas', 3)
+            memory_per_shard = constraints.get('memory_per_shard', 1.5)
+            memory_budget = constraints.get('memory_budget', 18)
+            
+            # Calculate minimum shards needed
+            import math
+            min_shards = math.ceil(dataset / max_docs_per_shard)
+            
+            # Find valid combination
+            for shards in range(min_shards, max_shards + 1):
+                for replicas in range(min_replicas, max_replicas + 1):
+                    total_memory = shards * replicas * memory_per_shard
+                    if total_memory <= memory_budget:
+                        return json_module.dumps({"shards": shards, "replicas": replicas})
+            
+            # Fallback
+            return json_module.dumps({"shards": 6, "replicas": 2})
+            
+        except Exception as e:
+            logger.error(f"Shards heuristic failed: {e}")
+            return None
 
 
 # ============================================================================
@@ -506,6 +545,7 @@ async def try_heuristic(task_type: str, context: TaskContext) -> Optional[str]:
         'file_path': HeuristicSolver.solve_file_path,
         'github': HeuristicSolver.solve_github_tree,
         'embedding': HeuristicSolver.solve_embedding,
+        'shards': HeuristicSolver.solve_shards,
     }
     
     if task_type in heuristics:
