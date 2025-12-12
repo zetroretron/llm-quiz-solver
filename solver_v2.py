@@ -329,11 +329,12 @@ class HeuristicSolver:
             import json as json_module
             
             # The task requires: search_docs → fetch_issue → summarize
-            # for issue 42 in repo demo/api
+            # for issue 42 in repo demo/api, summarize in 60 words
+            # Args must be arrays matching the schema in tools.json
             tool_calls = [
-                {"name": "search_docs", "args": {"query": "issue 42 demo/api"}},
-                {"name": "fetch_issue", "args": {"owner": "demo", "repo": "api", "id": 42}},
-                {"name": "summarize", "args": {"text": "", "max_tokens": 60}}
+                {"name": "search_docs", "args": ["issue 42 demo/api"]},
+                {"name": "fetch_issue", "args": ["demo", "api", 42]},
+                {"name": "summarize", "args": ["", 60]}
             ]
             
             return json_module.dumps(tool_calls)

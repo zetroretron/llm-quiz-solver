@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.0.5 - Add tools heuristic
+# Version: 2.0.6 - Fix tools args format
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
