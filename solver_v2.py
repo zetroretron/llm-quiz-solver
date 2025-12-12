@@ -100,11 +100,18 @@ TASK_PATTERNS = {
         r'customer_id',
         r'running total',
     ],
+    'github': [
+        r'github\s*api',
+        r'github\.com',
+        r'git/trees',
+        r'gh-tree',
+        r'count.*\.md\s*files',
+        r'/repos/\{owner\}',
+        r'pathprefix',
+    ],
     'api': [
         r'custom header',
         r'-h "',
-        r'get\s+/',
-        r'post\s+/',
         r'api\s*:',
     ],
     'ml': [
@@ -167,12 +174,6 @@ TASK_PATTERNS = {
     'tools': [
         r'tool\s',
         r'function call',
-    ],
-    'github': [
-        r'github\s*api',
-        r'git/trees',
-        r'\.md\s*files',
-        r'gh-tree',
     ],
 }
 

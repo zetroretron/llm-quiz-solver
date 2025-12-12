@@ -175,8 +175,11 @@ class DataHandler(BaseHandler):
         # Sort by id
         if 'id' in df.columns:
             df.sort_values('id', inplace=True)
+            df = df.reset_index(drop=True)
         
-        return df.to_json(orient='records')
+        # Convert to records and output compact JSON
+        records = df.to_dict(orient='records')
+        return json.dumps(records, separators=(',', ':'))
     
     async def _handle_json_sort(self, context: TaskContext) -> str:
         """Handle JSON sorting tasks."""
