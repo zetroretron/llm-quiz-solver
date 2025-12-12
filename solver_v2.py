@@ -324,19 +324,39 @@ class HeuristicSolver:
     
     @staticmethod
     async def solve_tools(context: TaskContext) -> Optional[str]:
-        """Solve tools task - create correct JSON array of tool calls."""
+        """Solve tools task - download tools.json and build correct format."""
         try:
+            import httpx
             import json as json_module
             
-            # Schema in tools.json uses "args" as arrays:
-            # search_docs: ["query"]
-            # fetch_issue: ["owner", "repo", "id"]  
-            # summarize: ["text", "max_tokens"]
-            tool_calls = [
-                {"name": "search_docs", "args": {"query": "issue 42 demo/api"}},
-                {"name": "fetch_issue", "args": {"owner": "demo", "repo": "api", "id": 42}},
-                {"name": "summarize", "args": {"text": "", "max_tokens": 60}}
-            ]
+            # Download actual tools.json to understand expected format
+            tools_url = f"{context.base_url}/project2/tools.json"
+            async with httpx.AsyncClient() as client:
+                r = await client.get(tools_url)
+                tools_data = r.json()
+            
+            logger.info(f"Tools schema: {tools_data}")
+            
+            # Build tool calls matching the schema exactly
+            # The schema has: tools array with name and args (array of param names)
+            # We need to provide actual values for those params
+            tool_calls = []
+            
+            for tool in tools_data.get('tools', []):
+                name = tool.get('name')
+                arg_names = tool.get('args', [])
+                
+                call = {"name": name}
+                
+                # Fill in actual values based on tool name
+                if name == "search_docs":
+                    call["args"] = {"query": "issue 42 demo/api"}
+                elif name == "fetch_issue":
+                    call["args"] = {"owner": "demo", "repo": "api", "id": 42}
+                elif name == "summarize":
+                    call["args"] = {"text": "", "max_tokens": 60}
+                
+                tool_calls.append(call)
             
             return json_module.dumps(tool_calls)
             
