@@ -33,6 +33,12 @@ class ImageHandler(BaseHandler):
     async def handle(self, context: TaskContext) -> str:
         logger.info("Processing image task")
         
+        page_lower = context.page_text.lower()
+        
+        # Check for image diff task (before/after comparison)
+        if 'before' in page_lower and 'after' in page_lower and 'differ' in page_lower:
+            return await self._compare_images(context)
+        
         # Find image URL
         image_url = self._find_image_url(context)
         if not image_url:
@@ -43,8 +49,6 @@ class ImageHandler(BaseHandler):
         r = requests.get(image_url)
         
         # Determine task type
-        page_lower = context.page_text.lower()
-        
         if 'color' in page_lower or 'rgb' in page_lower or 'hex' in page_lower:
             return await self._analyze_colors(r.content, context)
         elif 'text' in page_lower or 'ocr' in page_lower:
@@ -52,6 +56,59 @@ class ImageHandler(BaseHandler):
         else:
             # Default to color analysis
             return await self._analyze_colors(r.content, context)
+    
+    async def _compare_images(self, context: TaskContext) -> str:
+        """Compare two images and count differing pixels."""
+        try:
+            from PIL import Image
+            import numpy as np
+            
+            # Find both image URLs
+            before_url = None
+            after_url = None
+            
+            patterns = [
+                (r'/project2/before\.png', 'before'),
+                (r'/project2/after\.png', 'after'),
+            ]
+            
+            for pattern, img_type in patterns:
+                match = re.search(pattern, context.page_text + context.html_content, re.IGNORECASE)
+                if match:
+                    url = context.base_url + match.group(0)
+                    if img_type == 'before':
+                        before_url = url
+                    else:
+                        after_url = url
+            
+            if not before_url:
+                before_url = f"{context.base_url}/project2/before.png"
+            if not after_url:
+                after_url = f"{context.base_url}/project2/after.png"
+            
+            logger.info(f"Comparing: {before_url} vs {after_url}")
+            
+            # Download both images
+            r1 = requests.get(before_url)
+            r2 = requests.get(after_url)
+            
+            # Load as RGB arrays
+            img1 = Image.open(BytesIO(r1.content)).convert('RGB')
+            img2 = Image.open(BytesIO(r2.content)).convert('RGB')
+            
+            arr1 = np.array(img1)
+            arr2 = np.array(img2)
+            
+            # Compare pixel-by-pixel: count where ANY channel differs
+            diff = (arr1 != arr2).any(axis=2)
+            count = int(diff.sum())
+            
+            logger.info(f"Differing pixels: {count}")
+            return str(count)
+            
+        except Exception as e:
+            logger.error(f"Image comparison failed: {e}")
+            return "skip"
     
     async def _analyze_colors(self, image_bytes: bytes, context: TaskContext) -> str:
         """Analyze image colors and return most frequent/dominant color."""
