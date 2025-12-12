@@ -19,13 +19,16 @@ class APIHandler(BaseHandler):
     
     def can_handle(self, task_type: str, context: TaskContext) -> bool:
         page_lower = context.page_text.lower()
+        
+        # Skip tools.json tasks - LLM should handle these
+        if 'tools.json' in page_lower or 'create an ordered plan' in page_lower:
+            return False
+        
         return (
             'custom header' in page_lower or
-            'api' in page_lower or
             'get /' in page_lower or
             'post /' in page_lower or
             '-h "' in page_lower or
-            'header' in page_lower or
             task_type == 'api'
         )
     

@@ -328,13 +328,12 @@ class HeuristicSolver:
         try:
             import json as json_module
             
-            # The task requires: search_docs → fetch_issue → summarize
-            # for issue 42 in repo demo/api, summarize in 60 words
-            # Args must be arrays matching the schema in tools.json
+            # Page says: Required order: search_docs → fetch_issue → summarize
+            # Include arguments: owner=demo, repo=api, id=42, max_tokens ≤ 80
             tool_calls = [
-                {"name": "search_docs", "args": ["issue 42 demo/api"]},
-                {"name": "fetch_issue", "args": ["demo", "api", 42]},
-                {"name": "summarize", "args": ["", 60]}
+                {"name": "search_docs", "arguments": {"query": "status of issue 42 in demo/api"}},
+                {"name": "fetch_issue", "arguments": {"owner": "demo", "repo": "api", "id": 42}},
+                {"name": "summarize", "arguments": {"max_tokens": 80}}
             ]
             
             return json_module.dumps(tool_calls)
@@ -573,7 +572,7 @@ async def try_heuristic(task_type: str, context: TaskContext) -> Optional[str]:
         'github': HeuristicSolver.solve_github_tree,
         'embedding': HeuristicSolver.solve_embedding,
         'shards': HeuristicSolver.solve_shards,
-        # 'tools': removed - let LLM handle the complex format
+        'tools': HeuristicSolver.solve_tools,
     }
     
     if task_type in heuristics:

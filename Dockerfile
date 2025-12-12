@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.0.8 - Fix DataHandler to skip tools.json
+# Version: 2.0.9 - Fix APIHandler + tools heuristic with named args
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
