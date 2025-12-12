@@ -337,11 +337,11 @@ class HeuristicSolver:
             
             logger.info(f"Tools schema: {tools_data}")
             
-            # This is a PLAN, not execution. Summarize takes output from previous step.
+            # Try FLAT format - args at same level as name
             tool_calls = [
-                {"name": "search_docs", "args": ["status of issue 42 in demo/api"]},
-                {"name": "fetch_issue", "args": ["demo", "api", 42]},
-                {"name": "summarize", "args": [60]}
+                {"name": "search_docs", "query": "demo/api issue 42"},
+                {"name": "fetch_issue", "owner": "demo", "repo": "api", "id": 42},
+                {"name": "summarize", "max_tokens": 60}
             ]
             
             return json_module.dumps(tool_calls)
