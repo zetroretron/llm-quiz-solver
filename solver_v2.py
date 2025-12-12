@@ -123,10 +123,11 @@ TASK_PATTERNS = {
     ],
     'rate': [
         r'rate\.json',
-        r'rate.limit',
-        r'per.minute',
-        r'per.hour',
-        r'minimum.*minutes',
+        r'project2-rate',
+        r'per-minute',
+        r'per-hour',
+        r'minimal.*minutes',
+        r'fetch all pages',
     ],
     'ml': [
         r'predict',
