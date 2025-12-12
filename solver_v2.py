@@ -329,7 +329,7 @@ class HeuristicSolver:
             import httpx
             import json as json_module
             
-            # Download actual tools.json to understand expected format
+            # Download actual tools.json
             tools_url = f"{context.base_url}/project2/tools.json"
             async with httpx.AsyncClient() as client:
                 r = await client.get(tools_url)
@@ -337,12 +337,11 @@ class HeuristicSolver:
             
             logger.info(f"Tools schema: {tools_data}")
             
-            # Schema shows args as ARRAYS of param names: ['query'], ['owner', 'repo', 'id']
-            # So we need to provide VALUE ARRAYS: ['actual query'], ['demo', 'api', 42]
+            # This is a PLAN, not execution. Summarize takes output from previous step.
             tool_calls = [
-                {"name": "search_docs", "args": ["issue 42 demo/api"]},
+                {"name": "search_docs", "args": ["status of issue 42 in demo/api"]},
                 {"name": "fetch_issue", "args": ["demo", "api", 42]},
-                {"name": "summarize", "args": ["", 60]}
+                {"name": "summarize", "args": [60]}
             ]
             
             return json_module.dumps(tool_calls)
