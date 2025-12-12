@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.0.3 - Add shards heuristic for 100% accuracy
+# Version: 2.0.4 - Fix shards classification
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app

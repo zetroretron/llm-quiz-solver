@@ -114,9 +114,15 @@ TASK_PATTERNS = {
         r'-h "',
         r'api\s*:',
     ],
+    'shards': [
+        r'shards\.json',
+        r'docs per shard',
+        r'replicas',
+        r'memory_budget',
+        r'max_shards',
+    ],
     'ml': [
         r'predict',
-        r'model',
         r'train',
         r'regression',
         r'classification',
