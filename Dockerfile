@@ -1,26 +1,36 @@
-# Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.3.5 - Added tweets sentiment count heuristic
-FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
+# Version: 2.3.6 - python:3.11-slim base with playwright install
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy requirements
+# Install system dependencies for Playwright
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpango-1.0-0 \
+    libcairo2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for caching
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# "Download if needed, else use what is there"
-# This command checks if browsers are installed. 
-# Since we use the official image, it will see them and skip downloading (Fast).
-# If something was missing, it would download it.
-RUN playwright install
+# Install Playwright Chromium
+RUN playwright install chromium
 
 # Copy application code
 COPY . .
 
-# Fix permissions: Allow any user to write to the app directory
-# This avoids the "User already exists" error and works for any UID Hugging Face uses.
+# Fix permissions
 RUN chmod -R 777 /app
 
 # Expose the standard Hugging Face port
