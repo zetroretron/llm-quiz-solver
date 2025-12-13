@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.2.3 - Fixed duplicate patterns + rate logic
+# Version: 2.3.0 - RATE TASK FIX - force rebuild
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app
