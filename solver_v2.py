@@ -197,6 +197,12 @@ def classify_task(page_text: str) -> str:
     
     logger.info("📋 Task classified as: unknown (will use LLM)")
     logger.info(f"Checked {len(TASK_PATTERNS)} task types against text.")
+    
+    # Fallback/Failsafe for rate task
+    if 'rate.json' in page_lower or 'project2-rate' in page_lower:
+        logger.info("📋 Fallback: Task classified as: rate")
+        return 'rate'
+        
     return 'unknown'
 
 
