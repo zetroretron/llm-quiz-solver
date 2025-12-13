@@ -186,13 +186,17 @@ def classify_task(page_text: str) -> str:
     """Classify the task type based on page content."""
     page_lower = page_text.lower()
     
+    logger.info(f"Text length: {len(page_lower)}")
+    logger.info(f"Text preview: {page_lower[:200]}")
+    
     for task_type, patterns in TASK_PATTERNS.items():
         for pattern in patterns:
             if re.search(pattern, page_lower, re.IGNORECASE):
-                logger.info(f"📋 Task classified as: {task_type}")
+                logger.info(f"📋 Task classified as: {task_type} (matched: {pattern})")
                 return task_type
     
     logger.info("📋 Task classified as: unknown (will use LLM)")
+    logger.info(f"Checked {len(TASK_PATTERNS)} task types against text.")
     return 'unknown'
 
 
