@@ -1,5 +1,5 @@
 # Use the official Playwright image (Pre-installed browsers = FAST build)
-# Version: 2.3.3 - Final Verification Rebuild
+# Version: 2.3.5 - Added tweets sentiment count heuristic
 FROM mcr.microsoft.com/playwright/python:v1.49.0-jammy
 
 WORKDIR /app

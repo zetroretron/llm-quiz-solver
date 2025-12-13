@@ -129,6 +129,12 @@ TASK_PATTERNS = {
         r'minimal.*minutes',
         r'fetch all pages',
     ],
+    'tweets': [
+        r'tweets\.json',
+        r'sentiment.*positive',
+        r'count.*tweets',
+        r'positive.*sentiment',
+    ],
     'ml': [
         r'predict',
         r'train',
@@ -404,6 +410,39 @@ class HeuristicSolver:
             logger.error(f"Rate heuristic failed: {e}")
             return None
 
+    @staticmethod
+    async def solve_tweets(context: TaskContext) -> Optional[str]:
+        """Count tweets with positive sentiment - returns only the integer count."""
+        try:
+            import httpx
+            import re
+            
+            # Find the tweets.json URL
+            match = re.search(r'(/project2[^\s]*tweets\.json)', context.page_text)
+            if match:
+                file_path = match.group(1)
+            else:
+                file_path = "/project2-reevals/tweets.json"
+                
+            url = f"{context.base_url}{file_path}"
+            logger.info(f"Downloading tweets from: {url}")
+            
+            async with httpx.AsyncClient() as client:
+                r = await client.get(url)
+                tweets_data = r.json()
+            
+            # Count tweets with sentiment == "positive"
+            positive_count = sum(1 for tweet in tweets_data if tweet.get('sentiment') == 'positive')
+            
+            logger.info(f"Total tweets: {len(tweets_data)}, Positive: {positive_count}")
+            
+            # Return ONLY the integer count as a string
+            return str(positive_count)
+            
+        except Exception as e:
+            logger.error(f"Tweets heuristic failed: {e}")
+            return None
+
 
 # ============================================================================
 # HANDLER REGISTRY
@@ -636,6 +675,7 @@ async def try_heuristic(task_type: str, context: TaskContext) -> Optional[str]:
         'shards': HeuristicSolver.solve_shards,
         'tools': HeuristicSolver.solve_tools,
         'rate': HeuristicSolver.solve_rate,
+        'tweets': HeuristicSolver.solve_tweets,
     }
     
     if task_type in heuristics:

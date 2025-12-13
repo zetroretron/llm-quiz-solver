@@ -11,7 +11,8 @@ SECRET = "My_Secret_Key"  # Must match STUDENT_SECRET in Hugging Face
 EMAIL = "23f2004645@ds.study.iitm.ac.in"
 
 TEST_URLS = [
-    "https://tds-llm-analysis.s-anand.net/project2",
+    # "https://tds-llm-analysis.s-anand.net/project2",
+    "https://tds-llm-analysis.s-anand.net/project2-reevals",
     # "https://tds-llm-analysis.s-anand.net/demo",
     # "https://tds-llm-analysis.s-anand.net/demo2",
     # "https://p2testingone.vercel.app/q1.html",
